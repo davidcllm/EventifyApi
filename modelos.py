@@ -1,6 +1,6 @@
 import enum
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, Column, Integer, String, Date, Time, ForeignKey, Numeric, Enum, CHAR, UniqueConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Date, Time, ForeignKey, Numeric, Enum, CHAR, DateTime, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 
 from sqlalchemy import DateTime
@@ -35,8 +35,7 @@ class Evento(Base):
     id_evento = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable=False)
     descripcion = Column(String(350))
-    fecha_inicio = Column(Date, nullable=False)
-    hora_inicio = Column(Time, nullable=False)
+    fecha_inicio = Column(DateTime(timezone=True), nullable=False)    
     lugar = Column(String(125), nullable=False)
     capacidad = Column(Integer, nullable=False)
     tipos_boleto = relationship("TipoBoleto", back_populates="evento")
@@ -47,6 +46,7 @@ class Reservacion(Base):
     estado = Column(Enum(EstadoReservacion), nullable=False, default=EstadoReservacion.CREADA)
 
     id_cliente = Column(Integer, ForeignKey('cliente.id_cliente'), nullable=False)
+    cancelada_en = Column(DateTime(timezone=True), nullable=True)
     cliente = relationship("Cliente", back_populates="reservaciones")
 
     #1.2 Reservacion: paid_at

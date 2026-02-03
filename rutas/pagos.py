@@ -6,6 +6,7 @@ from sqlalchemy import func
 from base_de_datos import obtener_db
 from modelos import Reservacion, EstadoReservacion, Boleto, TipoBoleto
 
+
 enrutador = APIRouter(prefix="/reservations", tags=["Pagos y Cancelaciones"])
 
 # 5.1 Pagar (Validar cupos y cambiar estado a PAGADA)
