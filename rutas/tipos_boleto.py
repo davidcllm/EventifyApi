@@ -10,7 +10,7 @@ from modelos import Evento, TipoBoleto, DenominacionBoleto
 
 enrutador = APIRouter(prefix="/events", tags=["Tipos de Boleto"])
 
-
+# Se crean estos schemas para validar la solicitud y controlar la respuesta.
 class DenominacionBoletoSchema(str, Enum):
     VIP = "VIP"
     GENERAL = "GENERAL"
