@@ -47,7 +47,7 @@ def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Dep
     # En caso de cumplir con lo anterior, creamos el nuevo tipo.
     nuevo_tipo = TipoBoleto(
         id_evento=id_evento,
-        denominacion=DenominacionBoleto[datos.name],
+        denominacion=DenominacionBoleto(datos.name.value),
         precio=datos.price,
         cupo=datos.quota
     )
