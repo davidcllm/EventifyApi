@@ -12,8 +12,8 @@ class EstadoReservacion(enum.Enum):
 
 class DenominacionBoleto(enum.Enum):
     VIP = "VIP"
-    General = "General"
-    Preferente = "Preferente"
+    General = "GENERAL"
+    Preferente = "PREFERENTE"
 
 class Cliente(Base):
     __tablename__ = 'cliente'
