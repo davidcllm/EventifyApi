@@ -8,15 +8,12 @@ from modelos import Reservacion, EstadoReservacion, Boleto, TipoBoleto
 
 enrutador = APIRouter(prefix="/reservations", tags=["Pagos y Cancelaciones"])
 
-
 # 5.1 Pagar (Validar cupos y cambiar estado a PAGADA)
 @enrutador.post("/{id_reservacion}/pay")
 def pagar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
-    reservacion = (
-        db.query(Reservacion)
-        .filter(Reservacion.id_reservacion == id_reservacion)
-        .first()
-    )
+    reservacion = db.query(Reservacion).filter(
+        Reservacion.id_reservacion == id_reservacion
+    ).first()
 
     if not reservacion:
         raise HTTPException(
@@ -47,14 +44,9 @@ def pagar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
             detail={"error_code": "VALIDATION_ERROR", "message": "La reservación no tiene boletos"}
         )
 
-    # Detectar el evento de la reservación (por si Reservacion no tiene id_evento)
-    # Si tu Reservacion SÍ tiene id_evento, usa reservacion.id_evento y ya.
-    event_id = (
-        db.query(Boleto.id_evento)
-        .filter(Boleto.id_reservacion == id_reservacion)
-        .first()
-    )
-    event_id = event_id[0] if event_id else None
+    # Determinar el evento de esa reservación vía boletos
+    event_row = db.query(Boleto.id_evento).filter(Boleto.id_reservacion == id_reservacion).first()
+    event_id = event_row[0] if event_row else None
 
     if event_id is None:
         raise HTTPException(
@@ -65,11 +57,9 @@ def pagar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
     detalles_error = []
 
     for item in items:
-        tipo = (
-            db.query(TipoBoleto)
-            .filter(TipoBoleto.id_tipo_boleto == item.ticket_type_id)
-            .first()
-        )
+        tipo = db.query(TipoBoleto).filter(
+            TipoBoleto.id_tipo_boleto == item.ticket_type_id
+        ).first()
 
         if not tipo:
             raise HTTPException(
@@ -107,12 +97,11 @@ def pagar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
             status_code=409,
             detail={
                 "error_code": "INSUFFICIENT_QUOTA",
-                "message": "No hay cupo suficiente para una o más categorías.",
+                "message": "Not enough tickets available for one or more categories.",
                 "details": detalles_error
             }
         )
-
-    # Pagar
+    #Pagar
     reservacion.estado = EstadoReservacion.PAGADA
     reservacion.paid_at = datetime.now(timezone.utc).replace(microsecond=0)
 
@@ -134,15 +123,12 @@ def pagar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
         "totals": {"currency": "MXN", "total": float(total)}
     }
 
-
 # 5.2 Cancelar reservación
 @enrutador.post("/{id_reservacion}/cancel")
 def cancelar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db)):
-    reservacion = (
-        db.query(Reservacion)
-        .filter(Reservacion.id_reservacion == id_reservacion)
-        .first()
-    )
+    reservacion = db.query(Reservacion).filter(
+        Reservacion.id_reservacion == id_reservacion
+    ).first()
 
     if not reservacion:
         raise HTTPException(
@@ -160,7 +146,7 @@ def cancelar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db))
         return {
             "id": reservacion.id_reservacion,
             "status": reservacion.estado.value,
-            "cancelada_en": reservacion.cancelada_en.isoformat()
+            "canceled_at": reservacion.cancelada_en.isoformat()
         }
 
     reservacion.estado = EstadoReservacion.CANCELADA
@@ -172,5 +158,5 @@ def cancelar_reservacion(id_reservacion: int, db: Session = Depends(obtener_db))
     return {
         "id": reservacion.id_reservacion,
         "status": reservacion.estado.value,
-        "cancelada_en": reservacion.cancelada_en.isoformat()
+        "canceled_at": reservacion.cancelada_en.isoformat()
     }
