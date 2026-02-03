@@ -23,8 +23,8 @@ class Cliente(Base):
     id_cliente = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable=False)
     correo = Column(String(200), nullable=False, unique=True, index=True)
-    telefono = Column(String(10), nullable=False)
-    
+    telefono = Column(String(30), nullable=False) #diferentes formatos
+
     #1.1 Cliente: created_at + correo único
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
 
@@ -75,4 +75,9 @@ class Boleto(Base):
     id_reservacion = Column(Integer, ForeignKey('reservacion.id_reservacion'), nullable=False)
     id_asiento = Column(Integer, ForeignKey('asiento.id_asiento'), nullable=False)
     id_evento = Column(Integer, ForeignKey('evento.id_evento'), nullable=False)
+
+    #1.3 Boleto: link a TipoBoleto
+    id_tipo_boleto = Column(Integer, ForeignKey('tipo_boleto.id_tipo_boleto'), nullable=False)
+    tipo_boleto = relationship("TipoBoleto")
+
     reservacion = relationship("Reservacion", back_populates="boletos")
