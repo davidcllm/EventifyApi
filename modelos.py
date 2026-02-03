@@ -1,6 +1,6 @@
 import enum
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, Column, Integer, String, Date, Time, ForeignKey, Numeric, Enum, CHAR
+from sqlalchemy import create_engine, Column, Integer, String, Date, Time, ForeignKey, Numeric, Enum, CHAR, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 
 from base_de_datos import Base
@@ -50,6 +50,15 @@ class Asiento(Base):
 
 class TipoBoleto(Base):
     __tablename__ = 'tipo_boleto'
+
+    # Se agrega el Unique Constraint para que el nombre sea único
+    __table_args__ = (
+        UniqueConstraint(
+            'id_evento',
+            'denominacion',
+            name='uq_evento_denominacion_boleto'
+        ),
+    )
     id_tipo_boleto = Column(Integer, primary_key=True)
     id_evento = Column(Integer, ForeignKey('evento.id_evento'), nullable=False)
     denominacion = Column(Enum(DenominacionBoleto), nullable=False)

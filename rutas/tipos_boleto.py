@@ -47,9 +47,18 @@ def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Dep
         cupo=datos.quota
     )
 
-    db.add(nuevo_tipo)
-    db.commit()
-    db.refresh(nuevo_tipo)
+    # Intenta guardar el registro. Si ya hay uno con ese nombre, arrojará un error de tipo 409.
+    try:
+        db.add(nuevo_tipo)
+        db.commit()
+        db.refresh(nuevo_tipo)
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Ya existe un tipo de boleto con ese nombre para este evento"
+        )
 
     # Devolvemos la respuesta limpia, que será de tipo 201.
     return {
