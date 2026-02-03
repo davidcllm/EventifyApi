@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from pydantic import BaseModel
+from decimal import Decimal
+from enum import Enum
 
 from base_de_datos import obtener_db
 from modelos import Evento, TipoBoleto, DenominacionBoleto
 
 enrutador = APIRouter(prefix="/events", tags=["Tipos de Boleto"])
+
 
 class DenominacionBoletoSchema(str, Enum):
     VIP = "VIP"
@@ -32,7 +37,7 @@ def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Dep
 
     # Primero se comprueba que el evento exista, por lo que le pasamos el id,
     # si no, devuelve un respuesta de tipo 404 (Not Found).
-    evento = db.query(Evento).filter(Evento.id_evento == event_id).first()
+    evento = db.query(Evento).filter(Evento.id_evento == id_evento).first()
     if not evento:
         raise HTTPException(
             status_code=404,
@@ -41,7 +46,7 @@ def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Dep
 
     # En caso de cumplir con lo anterior, creamos el nuevo tipo.
     nuevo_tipo = TipoBoleto(
-        id_evento=event_id,
+        id_evento=id_evento,
         denominacion=DenominacionBoleto[datos.name],
         precio=datos.price,
         cupo=datos.quota
