@@ -14,7 +14,7 @@ host = os.getenv("DB_HOST", "db")
 port = os.getenv("DB_PORT", "5432")
 db_name = os.getenv("DB_NAME")
 
-# Construcción del string de conexion.
+# Construcción del string de conexión.
 DATABASE_URL = (
     f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 )
