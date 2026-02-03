@@ -38,6 +38,7 @@ class Reservacion(Base):
     id_reservacion = Column(Integer, primary_key=True)
     estado = Column(Enum(EstadoReservacion), nullable=False, default=EstadoReservacion.CREADA)
     id_cliente = Column(Integer, ForeignKey('cliente.id_cliente'), nullable=False)
+    cancelada_en = Column(DateTime(timezone=True), nullable=True)
     cliente = relationship("Cliente", back_populates="reservaciones")
     boletos = relationship("Boleto", back_populates="reservacion")
 
