@@ -30,7 +30,7 @@ class TipoBoletoResponse(BaseModel):
 def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Depends(obtener_db)):
     # 3.1 Crear tipo de boleto por evento
 
-    # Primero se comprueba que el eveto exista, por lo que le pasamos el id,
+    # Primero se comprueba que el evento exista, por lo que le pasamos el id,
     # si no, devuelve un respuesta de tipo 404 (Not Found).
     evento = db.query(Evento).filter(Evento.id_evento == event_id).first()
     if not evento:
@@ -51,7 +51,7 @@ def crear_tipo_boleto(id_evento: int, datos: TipoBoletoCreate, db: Session = Dep
     db.commit()
     db.refresh(nuevo_tipo)
 
-    # Devolvemos la respuesta limpia, que sera de tipo 201.
+    # Devolvemos la respuesta limpia, que será de tipo 201.
     return {
         "id": nuevo_tipo.id_tipo_boleto,
         "event_id": nuevo_tipo.id_evento,
