@@ -6,9 +6,14 @@ from datetime import datetime, timezone
 from base_de_datos import obtener_db
 from modelos import Cliente
 
+
 enrutador = APIRouter(prefix="/clients", tags=["Clientes"])
 
 # 1.1 Crear cliente
+# POST /clients/
+# Si falta algún campo o viene vacío = 400 VALIDATION_ERROR
+# Si el email ya existe = 409 con error JSON
+
 @enrutador.post("/", status_code=201)
 def crear_cliente(payload: dict, db: Session = Depends(obtener_db)):
     for field in ("name", "email", "phone"):
